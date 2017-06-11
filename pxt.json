@@ -4,7 +4,7 @@
     "description": "hacked up neopixel driver to allow bluetooth, corruption be damned",
     "license": "MIT",
     "dependencies": {
-        "core": "*",
+        "core": "*"
     },
     "files": [
         "README.md",

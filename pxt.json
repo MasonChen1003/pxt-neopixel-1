@@ -1,6 +1,6 @@
 {
     "name": "neopixel-bluetoothallowed",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "hacked up neopixel driver to allow bluetooth, corruption be damned",
     "license": "MIT",
     "dependencies": {

@@ -9,16 +9,13 @@ sendBufferAsm:
     ; Example: r5 = length, r4 = buffer start address
     
     ; Set GPIO 12 as output
-    movw r0, #0x14000
-    movt r0, #0x4001
+    ldr r0, =0x40014000  ; Load SIO base address
     ldr r1, =0x1000      ; GPIO 12 set (1 << 12)
     str r1, [r0, #0x04]  ; Set GPIO 12 direction to output
 
     ; Load addresses of the set and clear registers
-    movw r2, #0x1401C
-    movt r2, #0x4001     ; GPIO_OUT_CLR
-    movw r3, #0x14018
-    movt r3, #0x4001     ; GPIO_OUT_SET
+    ldr r2, =0x4001401C  ; GPIO_OUT_CLR
+    ldr r3, =0x40014018  ; GPIO_OUT_SET
     ldr r1, =0x1000      ; Mask for GPIO 12 (1 << 12)
 
     cpsid i              ; disable irq
@@ -57,3 +54,6 @@ sendBufferAsm:
     cpsie i            ; enable irq
 
     pop {r4,r5,r6,r7,pc}
+    
+    ; Constants loaded using literal pool
+    .ltorg

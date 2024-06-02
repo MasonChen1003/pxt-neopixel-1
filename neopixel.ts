@@ -49,7 +49,7 @@ namespace neopixel {
      */
     export class Strip {
         buf: Buffer;
-        pin: DigitalPin;
+        pin: DigitalInOutPin;
         // TODO: encode as bytes instead of 32bit
         brightness: number;
         start: number; // start offset in LED strip
@@ -212,7 +212,7 @@ namespace neopixel {
                 const k = i - this.start;
                 const ledoffset = i * stride;
                 const br = k > mid ? 255 * (this._length - 1 - k) * (this._length - 1 - k) / (mid * mid) : 255 * k * k / (mid * mid);
-                serial.writeLine(k + ":" + br);
+          //      serial.writeLine(k + ":" + br);
                 const r = (buf[ledoffset + 0] * br) >> 8; buf[ledoffset + 0] = r;
                 const g = (buf[ledoffset + 1] * br) >> 8; buf[ledoffset + 1] = g;
                 const b = (buf[ledoffset + 2] * br) >> 8; buf[ledoffset + 2] = b;
@@ -271,9 +271,10 @@ namespace neopixel {
          */
         //% weight=10
         //% parts="neopixel" advanced=true
-        setPin(pin: DigitalPin): void {
-            this.pin = pin;
-            pins.digitalWritePin(this.pin, 0);
+        setPin(pin: number): void {
+        //    this.pin = pin;
+            pins.pinByCfg(pin).digitalWritePin(false);
+         //   pins.digitalWritePin(this.pin, 0);
             // don't yield to avoid races on initialization
         }
 
@@ -368,7 +369,7 @@ namespace neopixel {
     //% weight=90 blockGap=8
     //% parts="neopixel"
     //% trackArgs=0,2
-    export function create(pin: DigitalPin, numleds: number, mode: NeoPixelMode): Strip {
+    export function create(pin: number, numleds: number, mode: NeoPixelMode): Strip {
         let strip = new Strip();
         let stride = mode === NeoPixelMode.RGBW ? 4 : 3;
         strip.buf = pins.createBuffer(numleds * stride);

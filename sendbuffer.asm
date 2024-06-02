@@ -9,16 +9,16 @@ sendBufferAsm:
     ; Example: r5 = length, r4 = buffer start address
     
     ; Set GPIO 12 as output
-    ldr r0, =SIO_BASE      ; Load SIO base address
-    ldr r1, =GPIO_12_MASK  ; GPIO 12 set (1 << 12)
-    str r1, [r0, #0x04]    ; Set GPIO 12 direction to output
+    ldr r0, [pc, #SIO_BASE_OFFSET]      ; Load SIO base address
+    ldr r1, [pc, #GPIO_12_MASK_OFFSET]  ; GPIO 12 set (1 << 12)
+    str r1, [r0, #0x04]                 ; Set GPIO 12 direction to output
 
     ; Load addresses of the set and clear registers
-    ldr r2, =GPIO_OUT_CLR  ; GPIO_OUT_CLR
-    ldr r3, =GPIO_OUT_SET  ; GPIO_OUT_SET
-    ldr r1, =GPIO_12_MASK  ; Mask for GPIO 12 (1 << 12)
+    ldr r2, [pc, #GPIO_OUT_CLR_OFFSET]  ; GPIO_OUT_CLR
+    ldr r3, [pc, #GPIO_OUT_SET_OFFSET]  ; GPIO_OUT_SET
+    ldr r1, [pc, #GPIO_12_MASK_OFFSET]  ; Mask for GPIO 12 (1 << 12)
 
-    cpsid i                ; disable irq
+    cpsid i                             ; disable irq
     
     b .start
     
@@ -56,6 +56,13 @@ sendBufferAsm:
     pop {r4,r5,r6,r7,pc}
 
     ; Constants loaded using manual constant pool
+    .align 4
+SIO_BASE_OFFSET:     .word SIO_BASE - .
+GPIO_12_MASK_OFFSET: .word GPIO_12_MASK - .
+GPIO_OUT_CLR_OFFSET: .word GPIO_OUT_CLR - .
+GPIO_OUT_SET_OFFSET: .word GPIO_OUT_SET - .
+
+    .align 4
 SIO_BASE:     .word 0x40014000
 GPIO_12_MASK: .word 0x00001000  ; (1 << 12)
 GPIO_OUT_CLR: .word 0x4001401C

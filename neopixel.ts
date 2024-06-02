@@ -41,7 +41,7 @@ enum NeoPixelMode {
 namespace neopixel {
     //% shim=sendBufferAsm
     //% parts="neopixel"
-    function sendBuffer(buf: Buffer, pin: DigitalPin) {
+    function sendBuffer(buf: Buffer, pin: number) {
     }
 
     /**

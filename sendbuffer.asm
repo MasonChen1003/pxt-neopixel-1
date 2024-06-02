@@ -3,41 +3,32 @@ sendBufferAsm:
     push {r4,r5,r6,r7,lr}
     
     mov r4, r0 ; save buff
-    mov r6, r1 ; save pin
-    
-    mov r0, r4
-    bl BufferMethods::length
-    mov r5, r0
-    
-    mov r0, r4
-    bl BufferMethods::getBytes
-    mov r4, r0
-    
-    ; setup pin as digital
-    mov r0, r6
-    movs r1, #0
-    bl pins::digitalWritePin
-    
-    ; load pin address
-    mov r0, r6
-    bl pins::getPinAddress
+    mov r6, r1 ; save pin (pin is ignored for now as we are using GPIO 12 fixed)
 
-    ldr r0, [r0, #8] ; get mbed DigitalOut from MicroBitPin
-    ldr r1, [r0, #4] ; r1-mask for this pin
-    ldr r2, [r0, #16] ; r2-clraddr
-    ldr r3, [r0, #12] ; r3-setaddr
+    ; Assume buffer length is in r5 and buffer start address is in r4
+    ; Example: r5 = length, r4 = buffer start address
     
-    cpsid i ; disable irq
+    ; Set GPIO 12 as output
+    ldr r0, =0x40014000  ; Base address of SIO
+    ldr r1, =0x10000000  ; GPIO 12 set (1 << 12)
+    str r1, [r0, #0x04]  ; Set GPIO 12 direction to output
+
+    ; Load addresses of the set and clear registers
+    ldr r2, =0x4001401C  ; GPIO_OUT_CLR
+    ldr r3, =0x40014018  ; GPIO_OUT_SET
+    ldr r1, =0x1000      ; Mask for GPIO 12 (1 << 12)
+
+    cpsid i              ; disable irq
     
     b .start
     
 .nextbit:               ;            C0
     str r1, [r3, #0]    ; pin := hi  C2
-    tst r6, r0          ;            C3
+    tst r7, r0          ;            C3
     bne .islate         ;            C4
     str r1, [r2, #0]    ; pin := lo  C6
 .islate:
-    lsrs r6, r6, #1     ; r6 >>= 1   C7
+    lsrs r7, r7, #1     ; r7 >>= 1   C7
     bne .justbit        ;            C8
     
     ; not just a bit - need new byte
@@ -45,7 +36,7 @@ sendBufferAsm:
     subs r5, #1         ; r5--       C10
     bcc .stop           ; if (r5<0) goto .stop  C11
 .start:
-    movs r6, #0x80      ; reset mask C12
+    movs r7, #0x80      ; reset mask C12
     nop                 ;            C13
 
 .common:               ;             C13
@@ -63,5 +54,6 @@ sendBufferAsm:
     cpsie i            ; enable irq
 
     pop {r4,r5,r6,r7,pc}
+
 
 

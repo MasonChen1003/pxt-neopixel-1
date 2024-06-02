@@ -161,7 +161,8 @@ namespace neopixel {
         //% weight=79
         //% parts="neopixel"
         show() {
-            sendBuffer(this.buf, this.pin);
+  //          sendBuffer(this.buf, this.pin);
+            sendBuffer(this.buf, 12);
         }
 
         /**
